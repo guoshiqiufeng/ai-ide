@@ -30,7 +30,7 @@ public class ApiSettingServiceImpl implements ApiSettingService {
     @Transactional
     public R<ApiSettingDTO> saveSetting(ApiSettingDTO dto) {
         ApiSetting setting = apiSettingRepository.findByIsActiveTrue()
-                .orElse(new ApiSetting());
+                .orElse(ApiSetting.builder().build());
 
         setting.setProvider(dto.getProvider());
         setting.setApiKey(dto.getApiKey());

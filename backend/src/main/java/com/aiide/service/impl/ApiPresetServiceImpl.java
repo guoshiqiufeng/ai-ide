@@ -101,7 +101,7 @@ public class ApiPresetServiceImpl implements ApiPresetService {
 
                     // Also update the active API setting
                     ApiSetting setting = apiSettingRepository.findByIsActiveTrue()
-                            .orElse(new ApiSetting());
+                            .orElse(ApiSetting.builder().build());
                     setting.setProvider(preset.getProvider());
                     setting.setApiKey(preset.getApiKey());
                     setting.setApiUrl(preset.getApiUrl());
