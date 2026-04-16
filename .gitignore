@@ -1,0 +1,32 @@
+# Backend
+backend/target/
+backend/*.iml
+backend/.idea/
+backend/.mvn/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/auto-imports.d.ts
+frontend/components.d.ts
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings/
