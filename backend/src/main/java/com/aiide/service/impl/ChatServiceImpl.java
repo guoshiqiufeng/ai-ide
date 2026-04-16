@@ -221,7 +221,12 @@ public class ChatServiceImpl implements ChatService {
                             task.setStatus("FAILED");
                             task.setResult("Error: " + e.getMessage());
                             taskRepository.save(task);
-                            sink.tryEmitNext(buildSSEData("task_error", "{\"taskId\":" + task.getId() + ",\"type\":\"" + taskType + "\",\"error\":\"" + e.getMessage() + "\"}"));
+                            try {
+                                String errorJson = objectMapper.writeValueAsString(e.getMessage());
+                                sink.tryEmitNext(buildSSEData("task_error", "{\"taskId\":" + task.getId() + ",\"type\":\"" + taskType + "\",\"error\":" + errorJson + "}"));
+                            } catch (Exception ex) {
+                                sink.tryEmitNext(buildSSEData("task_error", "{\"taskId\":" + task.getId() + ",\"type\":\"" + taskType + "\",\"error\":\"serialization error\"}"));
+                            }
                         }
                     });
                     parallelTasks.add(future);
@@ -299,6 +304,15 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private String buildSSEData(String event, String data) {
-        return "{\"event\":\"" + event + "\",\"data\":" + (data.startsWith("{") || data.startsWith("[") ? data : "\"" + data.replace("\"", "\\\"") + "\"") + "}";
+        try {
+            if (data.startsWith("{") || data.startsWith("[")) {
+                return "{\"event\":\"" + event + "\",\"data\":" + data + "}";
+            } else {
+                return "{\"event\":\"" + event + "\",\"data\":" + objectMapper.writeValueAsString(data) + "}";
+            }
+        } catch (Exception e) {
+            log.error("Failed to build SSE data", e);
+            return "{\"event\":\"error\",\"data\":\"Failed to serialize data\"}";
+        }
     }
 }
