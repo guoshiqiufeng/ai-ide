@@ -225,7 +225,7 @@ public class ChatServiceImpl implements ChatService {
                                 String errorJson = objectMapper.writeValueAsString(e.getMessage());
                                 sink.tryEmitNext(buildSSEData("task_error", "{\"taskId\":" + task.getId() + ",\"type\":\"" + taskType + "\",\"error\":" + errorJson + "}"));
                             } catch (Exception ex) {
-                                sink.tryEmitNext(buildSSEData("task_error", "{\"taskId\":" + task.getId() + ",\"type\":\"" + taskType + ",\"error\":\"serialization error\"}"));
+                                sink.tryEmitNext(buildSSEData("task_error", "{\"taskId\":" + task.getId() + ",\"type\":\"" + taskType + "\",\"error\":\"serialization error\"}"));
                             }
                         }
                     });
