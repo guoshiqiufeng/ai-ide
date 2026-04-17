@@ -91,11 +91,6 @@ export const getTasksByMessage = (messageId: number) =>
   api.get<R<TaskDTO[]>>(`/chat/tasks/${messageId}`)
 
 // Chat SSE
-export const sendChatMessage = (sessionId: number | null, message: string): EventSource => {
-  // We use fetch for SSE POST
-  return null as unknown as EventSource
-}
-
 export const sendChat = async (
   sessionId: number | null,
   message: string,
