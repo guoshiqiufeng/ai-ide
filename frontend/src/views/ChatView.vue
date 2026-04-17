@@ -320,15 +320,34 @@ const handleSSEEvent = (event: { event: string; data: any }) => {
 
 const renderMarkdown = (text: string) => {
   if (!text) return ''
-  // Simple markdown rendering - code blocks and basic formatting
-  return text
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="code-block"><code class="language-$1">$2</code></pre>')
-    .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-    .replace(/### (.+)/g, '<h4>$1</h4>')
-    .replace(/## (.+)/g, '<h3>$1</h3>')
-    .replace(/# (.+)/g, '<h2>$1</h2>')
+  // Extract code blocks first to protect them from heading/formatting replacements
+  const codeBlocks: string[] = []
+  let processed = text.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
+    const index = codeBlocks.length
+    codeBlocks.push(`<pre class="code-block"><code class="language-${lang}">${code}</code></pre>`)
+    return `%%CODEBLOCK_${index}%%`
+  })
+
+  // Apply inline code
+  processed = processed.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+
+  // Apply heading replacements (most specific first, anchored to line start)
+  processed = processed
+    .replace(/^### (.+)/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)/gm, '<h2>$1</h2>')
+
+  // Apply other formatting
+  processed = processed
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>')
+
+  // Restore code blocks
+  codeBlocks.forEach((block, index) => {
+    processed = processed.replace(`%%CODEBLOCK_${index}%%`, block)
+  })
+
+  return processed
 }
 
 const getTaskLabel = (type: string) => {
